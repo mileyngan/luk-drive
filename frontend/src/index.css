@@ -1,0 +1,19 @@
+/* Remove all Tailwind directives and keep only custom CSS if you have any */
+/* If you don't have any custom CSS, you can make this file empty or just keep basic styles */
+
+/* Example of basic custom styles you might want to keep */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Add any other custom CSS you need, but remove all Tailwind directives */
