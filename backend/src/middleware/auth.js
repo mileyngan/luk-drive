@@ -1,43 +1,28 @@
-// ============ src/middleware/auth.js ============
-const jwt = require('jsonwebtoken');
-const supabase = require('../utils/supabase');
+const { verifyToken } = require('../config/auth');
 
-const authenticateToken = async (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
-  }
-
+const authenticate = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const token = req.headers.authorization?.split(' ')[1];
     
-    // Get user from database
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('*, schools(name, status)')
-      .eq('id', decoded.userId)
-      .single();
-
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
     }
 
-    req.user = user;
+    const decoded = verifyToken(token);
+    req.user = decoded;
     next();
   } catch (error) {
-    return res.status(403).json({ error: 'Invalid token' });
+    res.status(401).json({ error: 'Invalid token' });
   }
 };
 
-const requireRole = (roles) => {
+const authorize = (roles = []) => {
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    if (!roles.includes(req.user.role)) {
+    if (roles.length && !roles.includes(req.user.role)) {
       return res.status(403).json({ error: 'Insufficient permissions' });
     }
 
@@ -45,4 +30,4 @@ const requireRole = (roles) => {
   };
 };
 
-module.exports = { authenticateToken, requireRole };
+module.exports = { authenticate, authorize };
