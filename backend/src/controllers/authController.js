@@ -1,12 +1,12 @@
 const { supabase } = require('../config/database');
-const { generateToken, hashPassword, comparePassword } = require('../config/auth');
+const { generateToken, hashPassword } = require('../config/auth');
 
 const registerSchool = async (req, res) => {
   try {
     const { name, email, phone, address, city, region } = req.body;
 
     // Check if school already exists
-    const { data: existingSchool } = await supabase
+    const {  existingSchool, error: checkError } = await supabase
       .from('schools')
       .select('*')
       .eq('email', email)
@@ -17,7 +17,7 @@ const registerSchool = async (req, res) => {
     }
 
     // Create school
-    const { data: school, error: schoolError } = await supabase
+    const {  school, error: schoolError } = await supabase
       .from('schools')
       .insert([{
         name,
@@ -81,7 +81,7 @@ const login = async (req, res) => {
 
     // Check if school is approved (for non-super admins)
     if (user.role !== 'super_admin') {
-      const { data: school, error: schoolError } = await supabase
+      const {  school, error: schoolError } = await supabase
         .from('schools')
         .select('*')
         .eq('id', user.school_id)
@@ -92,13 +92,15 @@ const login = async (req, res) => {
       }
     }
 
-    // Verify password
+    // Verify password (you need to add comparePassword to auth.js)
+    const { comparePassword } = require('../config/auth');
     const isValidPassword = await comparePassword(password, user.password_hash);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     // Generate token
+    const { generateToken } = require('../config/auth');
     const token = generateToken({
       id: user.id,
       email: user.email,

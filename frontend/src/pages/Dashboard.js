@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Table, Alert, Button } from 'react-bootstrap';
-import { PersonFill, BookFill, QuestionCircleFill, PeopleFill, CheckCircle, Clock } from 'react-bootstrap-icons';
+import { Card, Row, Col, Table, Alert } from 'react-bootstrap';
+import { PersonFill, BookFill, QuestionCircleFill } from 'react-bootstrap-icons';
 import api from '../services/api';
 
 const Dashboard = () => {
@@ -71,7 +71,7 @@ const Dashboard = () => {
         <Col md={3} className="mb-3">
           <Card className="border-info h-100">
             <Card.Body className="text-center">
-              <CheckCircle className="text-info mb-2" size={40} />
+              <QuestionCircleFill className="text-info mb-2" size={40} />
               <h5 className="text-info">Active</h5>
               <Card.Text className="text-muted">System Status</Card.Text>
             </Card.Body>

@@ -17,6 +17,21 @@ const Quizzes = () => {
     fetchChapters();
   }, []);
 
+  const submitQuiz = async () => {
+    try {
+      await api.post('/quizzes/submit', {
+        chapter_id: currentQuiz.chapter.id,
+        answers: answers
+      });
+      setQuizStarted(false);
+      setCurrentQuiz(null);
+      setAnswers([]);
+      alert('Quiz submitted successfully!');
+    } catch (err) {
+      setError('Failed to submit quiz');
+    }
+  };
+
   useEffect(() => {
     let interval;
     if (quizStarted && timeLeft > 0) {
@@ -27,7 +42,7 @@ const Quizzes = () => {
       submitQuiz();
     }
     return () => clearInterval(interval);
-  }, [quizStarted, timeLeft]);
+  }, [quizStarted, timeLeft, submitQuiz]); // Added submitQuiz as dependency
 
   const fetchChapters = async () => {
     try {
@@ -68,21 +83,6 @@ const Quizzes = () => {
   const prevQuestion = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(prev => prev - 1);
-    }
-  };
-
-  const submitQuiz = async () => {
-    try {
-      await api.post('/quizzes/submit', {
-        chapter_id: currentQuiz.chapter.id,
-        answers: answers
-      });
-      setQuizStarted(false);
-      setCurrentQuiz(null);
-      setAnswers([]);
-      alert('Quiz submitted successfully!');
-    } catch (err) {
-      setError('Failed to submit quiz');
     }
   };
 

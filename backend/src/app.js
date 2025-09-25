@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+// Import routes
 const authRoutes = require('./routes/auth');
 const schoolRoutes = require('./routes/schools');
 const userRoutes = require('./routes/users');
@@ -44,6 +45,11 @@ app.use('/api/chat', chatRoutes);
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Test route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Server is working!' });
 });
 
 const PORT = process.env.PORT || 5000;

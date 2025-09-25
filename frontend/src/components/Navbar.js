@@ -80,11 +80,11 @@ const Navbar = () => {
           
           <ul className="navbar-nav">
             <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <span className="me-2">{user.first_name} {user.last_name}</span>
                 <span className="badge bg-secondary">{user.role}</span>
               </a>
-              <ul className="dropdown-menu">
+              <ul className="dropdown-menu dropdown-menu-end">
                 <li><span className="dropdown-item-text small text-muted">{user.school?.name || 'School'}</span></li>
                 <li><hr className="dropdown-divider" /></li>
                 <li><button className="dropdown-item" onClick={handleLogout}>

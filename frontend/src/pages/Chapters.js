@@ -18,10 +18,6 @@ const Chapters = () => {
     ebook_content: ''
   });
 
-  useEffect(() => {
-    fetchChapters();
-  }, [activeTab]);
-
   const fetchChapters = async () => {
     try {
       const response = await api.get(`/chapters?program_type=${activeTab}`);
@@ -32,6 +28,10 @@ const Chapters = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchChapters();
+  }, [activeTab, fetchChapters]); // Added fetchChapters as dependency
 
   const handleInputChange = (e) => {
     setFormData({
