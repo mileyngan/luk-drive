@@ -1,4 +1,5 @@
 const { supabase } = require('../config/database');
+const piracyService = require('../services/piracyService');
 
 const getChapters = async (req, res) => {
   try {
@@ -125,4 +126,48 @@ const deleteChapter = async (req, res) => {
   }
 };
 
-module.exports = { getChapters, createChapter, updateChapter, deleteChapter };
+const getChapterContent = async (req, res) => {
+  try {
+    const { chapterId } = req.params;
+    const { user_id } = req.user;
+
+    // Get chapter with encrypted content
+    const { data: chapter, error } = await supabase
+      .from('chapters')
+      .select('ebook_content')
+      .eq('id', chapterId)
+      .single();
+
+    if (error) throw error;
+
+    // Return encrypted content - frontend will decrypt with session key
+    res.json({
+      encryptedContent: chapter.ebook_content,
+      userId: user_id
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const validateChapterAccess = async (req, res) => {
+  try {
+    const { chapterId, deviceFingerprint } = req.body;
+    const { user_id, school_id } = req.user;
+
+    const validation = await piracyService.validateAccess(user_id, chapterId, deviceFingerprint);
+
+    if (!validation.valid) {
+      await piracyService.logIncident(user_id, school_id, validation.reason, {
+        chapterId,
+        deviceFingerprint
+      });
+    }
+
+    res.json(validation);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { getChapters, createChapter, updateChapter, deleteChapter, getChapterContent, validateChapterAccess };

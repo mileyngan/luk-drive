@@ -11,6 +11,8 @@ const userRoutes = require('./routes/users');
 const chapterRoutes = require('./routes/chapters');
 const quizRoutes = require('./routes/quizzes');
 const chatRoutes = require('./routes/chat');
+const piracyRoutes = require('./routes/piracy');
+const analyticsRoutes = require('./routes/analytics');
 
 const app = express();
 
@@ -41,6 +43,8 @@ app.use('/users', userRoutes);
 app.use('/chapters', chapterRoutes);
 app.use('/quizzes', quizRoutes);
 app.use('/chat', chatRoutes);
+app.use('/piracy', piracyRoutes);
+app.use('/analytics', analyticsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
