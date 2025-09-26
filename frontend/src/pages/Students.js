@@ -23,11 +23,20 @@ const Students = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await api.get('/users?role=student');
-      setStudents(response.data);
+      // Get all users from the current school (not just students)
+      const response = await api.get('/users');
+      console.log('All users response:', response.data); // Debug log
+      
+      // Filter for students only
+      const allUsers = Array.isArray(response.data) ? response.data : [];
+      const studentUsers = allUsers.filter(user => user.role === 'student');
+      
+      console.log('Filtered students:', studentUsers); // Debug log
+      setStudents(studentUsers);
       setLoading(false);
     } catch (err) {
-      setError('Failed to load students');
+      console.error('Students fetch error:', err);
+      setError('Failed to load students: ' + (err.response?.data?.error || err.message));
       setLoading(false);
     }
   };
@@ -42,7 +51,10 @@ const Students = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/users', formData);
+      console.log('Creating student with data:', formData); // Debug log
+      const response = await api.post('/users', formData);
+      console.log('Student creation response:', response.data); // Debug log
+      
       setShowModal(false);
       setFormData({
         first_name: '',
@@ -52,9 +64,10 @@ const Students = () => {
         role: 'student',
         program_type: 'novice'
       });
-      fetchStudents();
+      fetchStudents(); // Refresh the list
     } catch (err) {
-      setError('Failed to create student');
+      console.error('Student creation error:', err);
+      setError('Failed to create student: ' + (err.response?.data?.error || err.message));
     }
   };
 
@@ -88,36 +101,50 @@ const Students = () => {
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Program</th>
+                <th>Role</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {students.map((student) => (
-                <tr key={student.id}>
-                  <td>{student.first_name} {student.last_name}</td>
-                  <td>{student.email}</td>
-                  <td>{student.phone}</td>
-                  <td>
-                    <span className="badge bg-primary">
-                      {student.program_type}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`badge ${student.status === 'active' ? 'bg-success' : 'bg-warning'}`}>
-                      {student.status}
-                    </span>
-                  </td>
-                  <td>
-                    <Button variant="outline-primary" size="sm" className="me-2">
-                      <Pencil />
-                    </Button>
-                    <Button variant="outline-danger" size="sm">
-                      <Trash />
-                    </Button>
+              {students && students.length > 0 ? (
+                students.map((student) => (
+                  <tr key={student.id}>
+                    <td>{student.first_name} {student.last_name}</td>
+                    <td>{student.email}</td>
+                    <td>{student.phone}</td>
+                    <td>
+                      <span className="badge bg-primary">
+                        {student.program_type || 'N/A'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="badge bg-info">
+                        {student.role}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`badge ${student.status === 'active' ? 'bg-success' : 'bg-warning'}`}>
+                        {student.status}
+                      </span>
+                    </td>
+                    <td>
+                      <Button variant="outline-primary" size="sm" className="me-2">
+                        <Pencil />
+                      </Button>
+                      <Button variant="outline-danger" size="sm">
+                        <Trash />
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="text-center text-muted">
+                    No students found
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </Table>
         </Card.Body>

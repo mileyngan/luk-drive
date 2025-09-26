@@ -8,16 +8,16 @@ const {
   deleteChapter 
 } = require('../controllers/chapterController');
 
-// Get chapters
+// Get chapters (any authenticated user can view their school's chapters)
 router.get('/', authenticate, getChapters);
 
-// Create chapter
+// Create chapter (admin/instructor only)
 router.post('/', authenticate, authorize(['admin', 'instructor']), createChapter);
 
-// Update chapter
+// Update chapter (admin/instructor only)
 router.put('/:chapterId', authenticate, authorize(['admin', 'instructor']), updateChapter);
 
-// Delete chapter
+// Delete chapter (admin/instructor only)
 router.delete('/:chapterId', authenticate, authorize(['admin', 'instructor']), deleteChapter);
 
 module.exports = router;

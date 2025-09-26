@@ -14,11 +14,12 @@ const Dashboard = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await api.get('/schools/stats');
+      const response = await api.get('/schools/stats'); // This will become /api/schools/stats due to baseURL
       setStats(response.data);
       setLoading(false);
     } catch (err) {
-      setError('Failed to load dashboard data');
+      console.error('Dashboard stats error:', err);
+      setError('Failed to load dashboard data: ' + err.response?.data?.error || err.message);
       setLoading(false);
     }
   };

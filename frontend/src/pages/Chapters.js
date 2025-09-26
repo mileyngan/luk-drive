@@ -18,20 +18,25 @@ const Chapters = () => {
     ebook_content: ''
   });
 
+  useEffect(() => {
+    fetchChapters();
+  }, [activeTab]);
+
   const fetchChapters = async () => {
     try {
       const response = await api.get(`/chapters?program_type=${activeTab}`);
-      setChapters(response.data);
+      console.log('Chapters response:', response.data); // Debug log
+      
+      // Ensure we're getting an array
+      const chaptersData = Array.isArray(response.data) ? response.data : [];
+      setChapters(chaptersData);
       setLoading(false);
     } catch (err) {
-      setError('Failed to load chapters');
+      console.error('Chapters fetch error:', err);
+      setError('Failed to load chapters: ' + (err.response?.data?.error || err.message));
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchChapters();
-  }, [activeTab, fetchChapters]); // Added fetchChapters as dependency
 
   const handleInputChange = (e) => {
     setFormData({
@@ -55,7 +60,8 @@ const Chapters = () => {
       });
       fetchChapters();
     } catch (err) {
-      setError('Failed to create chapter');
+      console.error('Chapter creation error:', err);
+      setError('Failed to create chapter: ' + (err.response?.data?.error || err.message));
     }
   };
 
@@ -194,33 +200,41 @@ const ChapterTable = ({ chapters }) => (
           </tr>
         </thead>
         <tbody>
-          {chapters.map((chapter) => (
-            <tr key={chapter.id}>
-              <td>{chapter.chapter_number}</td>
-              <td>{chapter.title}</td>
-              <td>{chapter.description?.substring(0, 50)}...</td>
-              <td>
-                {chapter.video_url ? (
-                  <Play className="text-primary" />
-                ) : (
-                  <Book className="text-muted" />
-                )}
-              </td>
-              <td>
-                <span className={`badge ${chapter.is_published ? 'bg-success' : 'bg-warning'}`}>
-                  {chapter.is_published ? 'Published' : 'Draft'}
-                </span>
-              </td>
-              <td>
-                <Button variant="outline-primary" size="sm" className="me-2">
-                  <Pencil />
-                </Button>
-                <Button variant="outline-danger" size="sm">
-                  <Trash />
-                </Button>
+          {chapters && chapters.length > 0 ? (
+            chapters.map((chapter) => (
+              <tr key={chapter.id}>
+                <td>{chapter.chapter_number}</td>
+                <td>{chapter.title}</td>
+                <td>{chapter.description?.substring(0, 50)}...</td>
+                <td>
+                  {chapter.video_url ? (
+                    <Play className="text-primary" />
+                  ) : (
+                    <Book className="text-muted" />
+                  )}
+                </td>
+                <td>
+                  <span className={`badge ${chapter.is_published ? 'bg-success' : 'bg-warning'}`}>
+                    {chapter.is_published ? 'Published' : 'Draft'}
+                  </span>
+                </td>
+                <td>
+                  <Button variant="outline-primary" size="sm" className="me-2">
+                    <Pencil />
+                  </Button>
+                  <Button variant="outline-danger" size="sm">
+                    <Trash />
+                  </Button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6" className="text-center text-muted">
+                No chapters found
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
     </Card.Body>

@@ -2,32 +2,57 @@ const { supabase } = require('../config/database');
 
 const getChapters = async (req, res) => {
   try {
+    console.log('GetChapters - Authenticated user:', req.user); // Debug log
     const { school_id } = req.user;
     const { program_type } = req.query;
+
+    console.log('GetChapters - School ID from token:', school_id); // Debug log
+    console.log('GetChapters - Program type:', program_type); // Debug log
+
+    if (!school_id) {
+      return res.status(400).json({ error: 'No school_id found in token' });
+    }
 
     let query = supabase
       .from('chapters')
       .select('*')
       .eq('school_id', school_id);
 
-    if (program_type) query = query.eq('program_type', program_type);
+    if (program_type) {
+      query = query.eq('program_type', program_type);
+      console.log('Filtering by program_type:', program_type); // Debug log
+    }
 
-    const {  chapters, error } = await query;
+    const result = await query;
+    console.log('Supabase chapters result:', result); // Debug log
 
-    if (error) throw error;
+    if (result.error) {
+      console.error('Supabase chapters query error:', result.error);
+      throw result.error;
+    }
 
-    res.json(chapters);
+    console.log('Chapters fetched from DB:', result.data); // Debug log
+    res.json(result.data || []);
   } catch (error) {
+    console.error('GetChapters error:', error);
     res.status(500).json({ error: error.message });
   }
 };
 
 const createChapter = async (req, res) => {
   try {
+    console.log('CreateChapter - Authenticated user:', req.user); // Debug log
     const { school_id } = req.user;
     const { title, description, program_type, chapter_number, video_url, ebook_content, is_published } = req.body;
 
-    const {  chapter, error } = await supabase
+    console.log('CreateChapter - School ID from token:', school_id); // Debug log
+    console.log('CreateChapter - Data received:', { title, description, program_type, chapter_number, video_url, ebook_content, is_published }); // Debug log
+
+    if (!school_id) {
+      return res.status(400).json({ error: 'No school_id found in token' });
+    }
+
+    const result = await supabase
       .from('chapters')
       .insert([{
         school_id,
@@ -42,10 +67,15 @@ const createChapter = async (req, res) => {
       .select()
       .single();
 
-    if (error) throw error;
+    if (result.error) {
+      console.error('Chapter creation error:', result.error);
+      throw result.error;
+    }
 
-    res.status(201).json(chapter);
+    console.log('Chapter created successfully:', result.data); // Debug log
+    res.status(201).json(result.data);
   } catch (error) {
+    console.error('CreateChapter error:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -55,7 +85,7 @@ const updateChapter = async (req, res) => {
     const { chapterId } = req.params;
     const { title, description, program_type, chapter_number, video_url, ebook_content, is_published } = req.body;
 
-    const {  chapter, error } = await supabase
+    const result = await supabase
       .from('chapters')
       .update({
         title,
@@ -70,9 +100,9 @@ const updateChapter = async (req, res) => {
       .select()
       .single();
 
-    if (error) throw error;
+    if (result.error) throw result.error;
 
-    res.json(chapter);
+    res.json(result.data);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -82,12 +112,12 @@ const deleteChapter = async (req, res) => {
   try {
     const { chapterId } = req.params;
 
-    const { error } = await supabase
+    const result = await supabase
       .from('chapters')
       .delete()
       .eq('id', chapterId);
 
-    if (error) throw error;
+    if (result.error) throw result.error;
 
     res.json({ message: 'Chapter deleted successfully' });
   } catch (error) {

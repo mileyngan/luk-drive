@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import { useAuth } from '../components/AuthProvider';
 import { Card, Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 

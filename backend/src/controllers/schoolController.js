@@ -64,12 +64,13 @@ const getSchoolStats = async (req, res) => {
       stats: {
         totalUsers: userCount,
         totalChapters: chapterCount,
-        totalProgress: progressData.length
+        totalProgress: progressData?.length || 0
       },
-      recentProgress: progressData.slice(0, 10)
+      recentProgress: progressData?.slice(0, 10) || []
     });
 
   } catch (error) {
+    console.error('School stats error:', error);
     res.status(500).json({ error: error.message });
   }
 };
