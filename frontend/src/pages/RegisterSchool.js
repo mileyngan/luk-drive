@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
 import { useAuth } from '../components/AuthProvider';
-import { Card, Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
+import { Card, Form, Button, Alert, Container, Row, Col, Modal } from 'react-bootstrap';
 
 const RegisterSchool = () => {
   const [formData, setFormData] = useState({
@@ -11,10 +10,12 @@ const RegisterSchool = () => {
     phone: '',
     address: '',
     city: 'Yaoundé',
-    region: 'Centre'
+    region: 'Centre',
+    subscription_plan: 'basic'
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   
   const { registerSchool } = useAuth();
   const navigate = useNavigate();
@@ -34,13 +35,17 @@ const RegisterSchool = () => {
     const result = await registerSchool(formData);
     
     if (result.success) {
-      alert('School registered successfully! Please wait for approval.');
-      navigate('/login');
+      setShowSuccessModal(true);
     } else {
       setError(result.error);
     }
     
     setLoading(false);
+  };
+
+  const handleModalClose = () => {
+    setShowSuccessModal(false);
+    navigate('/login');
   };
 
   return (
@@ -59,7 +64,7 @@ const RegisterSchool = () => {
                 <Row>
                   <Col md={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label>School Name</Form.Label>
+                      <Form.Label>School Name *</Form.Label>
                       <Form.Control
                         type="text"
                         name="name"
@@ -72,7 +77,7 @@ const RegisterSchool = () => {
                   </Col>
                   <Col md={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label>Email Address</Form.Label>
+                      <Form.Label>Email Address *</Form.Label>
                       <Form.Control
                         type="email"
                         name="email"
@@ -88,7 +93,7 @@ const RegisterSchool = () => {
                 <Row>
                   <Col md={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label>Phone Number</Form.Label>
+                      <Form.Label>Phone Number *</Form.Label>
                       <Form.Control
                         type="tel"
                         name="phone"
@@ -101,7 +106,7 @@ const RegisterSchool = () => {
                   </Col>
                   <Col md={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label>City</Form.Label>
+                      <Form.Label>City *</Form.Label>
                       <Form.Select
                         name="city"
                         value={formData.city}
@@ -120,7 +125,7 @@ const RegisterSchool = () => {
                 </Row>
 
                 <Form.Group className="mb-3">
-                  <Form.Label>Address</Form.Label>
+                  <Form.Label>Address *</Form.Label>
                   <Form.Control
                     type="text"
                     name="address"
@@ -128,6 +133,28 @@ const RegisterSchool = () => {
                     onChange={handleChange}
                     required
                     placeholder="Enter school address"
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Subscription Plan *</Form.Label>
+                  <Form.Select
+                    name="subscription_plan"
+                    value={formData.subscription_plan}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="basic">Basic - Free (Up to 50 students)</option>
+                    <option value="pro">Pro - $99/month (Up to 200 students)</option>
+                    <option value="enterprise">Enterprise - Custom (Unlimited)</option>
+                  </Form.Select>
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Check
+                    type="checkbox"
+                    required
+                    label="I agree to the Terms and Conditions and Privacy Policy"
                   />
                 </Form.Group>
 
@@ -156,6 +183,34 @@ const RegisterSchool = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* Success Modal */}
+      <Modal show={showSuccessModal} onHide={handleModalClose} centered>
+        <Modal.Header className="bg-success text-white">
+          <Modal.Title>Registration Successful!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="text-center">
+            <div className="mb-3">
+              <span className="display-4 text-success">✓</span>
+            </div>
+            <h5>Your registration is under review</h5>
+            <p className="text-muted">
+              We have received your registration request. Our team will review your application 
+              and send approval notification to your email within 24-48 hours.
+            </p>
+            <p className="text-muted">
+              You will receive an email with your one-time password to access your dashboard 
+              once approved.
+            </p>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleModalClose}>
+            Continue to Login
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
