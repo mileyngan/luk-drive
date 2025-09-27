@@ -1,4 +1,5 @@
 const piracyService = require('../services/piracyService');
+const { supabase } = require('../utils/supabase');
 
 const logIncident = async (req, res) => {
   try {

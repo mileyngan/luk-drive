@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from './AuthProvider';
 import { Link, useLocation } from 'react-router-dom';
-import { House, People, Book, QuestionCircle, ChatDots, Building, BoxArrowRight } from 'react-bootstrap-icons';
+import { House, People, Book, QuestionCircle, ChatDots, Building, BoxArrowRight, GraphUp } from 'react-bootstrap-icons';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -18,13 +18,15 @@ const Navbar = () => {
       case 'super_admin':
         return [
           { path: '/school-management', label: 'Schools', icon: Building },
-          { path: '/dashboard', label: 'Dashboard', icon: House }
+          { path: '/dashboard', label: 'Dashboard', icon: House },
+          { path: '/analytics', label: 'Analytics', icon: GraphUp }
         ];
       case 'admin':
         return [
           { path: '/dashboard', label: 'Dashboard', icon: House },
           { path: '/students', label: 'Students', icon: People },
           { path: '/chapters', label: 'Chapters', icon: Book },
+          { path: '/analytics', label: 'Analytics', icon: GraphUp },
           { path: '/chat', label: 'AI Chat', icon: ChatDots }
         ];
       case 'student':
@@ -39,6 +41,7 @@ const Navbar = () => {
           { path: '/dashboard', label: 'Dashboard', icon: House },
           { path: '/students', label: 'Students', icon: People },
           { path: '/chapters', label: 'Chapters', icon: Book },
+          { path: '/analytics', label: 'Analytics', icon: GraphUp },
           { path: '/chat', label: 'AI Chat', icon: ChatDots }
         ];
       default:

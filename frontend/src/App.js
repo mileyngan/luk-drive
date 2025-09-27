@@ -16,6 +16,7 @@ import Chat from './pages/Chat';
 import SchoolManagement from './pages/SchoolManagement';
 import InstructorDashboard from './pages/InstructorDashboard';
 import StudentDashboard from './pages/StudentDashboard';
+import AnalyticsDashboard from './pages/AnalyticsDashboard';
 
 function App() {
   return (
@@ -89,6 +90,17 @@ function App() {
                   <Navbar />
                   <div className="container-fluid">
                     <SchoolManagement />
+                  </div>
+                </>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/analytics" element={
+              <ProtectedRoute allowedRoles={['super_admin', 'admin', 'instructor']}>
+                <>
+                  <Navbar />
+                  <div className="container-fluid">
+                    <AnalyticsDashboard />
                   </div>
                 </>
               </ProtectedRoute>
